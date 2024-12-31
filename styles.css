@@ -160,7 +160,7 @@ body {
 .options-container {
     position: fixed;
     left: 50%;
-    top: 60%;
+    top: 50%;
     transform: translate(-50%, -50%);
     display: none;
     gap: 2rem;
@@ -169,6 +169,8 @@ body {
     width: calc(100% - 8rem);
     max-width: 500px;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .options-container.visible {
@@ -177,7 +179,7 @@ body {
 }
 
 .option-box {
-    flex: 1;
+    flex: 0 1 auto;
     padding: 1.5rem 2rem;
     background-color: #242424;
     border: 1px solid #ff3333;
@@ -189,6 +191,7 @@ body {
     text-align: center;
     min-width: 120px;
     max-width: 200px;
+    width: 100%;
 }
 
 .option-box.visible {
