@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Wait for fade out before removing from DOM
         setTimeout(() => {
             statusEl.style.display = 'none';
-        }, 300); // Shorter fade out to prevent visual gap
+        }, 500); // Match the CSS transition duration
     }
 
     // Simplified conversation state management
@@ -253,12 +253,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const data = await response.json();
-            return data.response;
+            
+            // Start the fade out
+            hideInferenceStatus();
+            
+            // Wait for fade out before showing response
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (data.response) {
+                // Transform the loading message into the response
+                const statusEl = document.getElementById('inference-status');
+                statusEl.classList.add('response');
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'response-content';
+                contentDiv.textContent = data.response;
+                statusEl.appendChild(contentDiv);
+
+                // Add to conversation state
+                const estimatedTokens = Math.ceil(data.response.length / 4);
+                await addMessage('helper', data.response, estimatedTokens);
+                
+                return data.response;
+            } else {
+                throw new Error('No response in data');
+            }
         } catch (error) {
             console.error('Error generating response:', error);
             return null;
-        } finally {
-            hideInferenceStatus();
         }
     }
 

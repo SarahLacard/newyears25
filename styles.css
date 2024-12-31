@@ -294,7 +294,7 @@ body {
 }
 
 .inference-status {
-    display: none; /* hidden by default, shown during generation */
+    display: none;
     align-items: center;
     gap: 0.5rem;
     font-family: 'Inter', monospace;
@@ -305,7 +305,7 @@ body {
     border-radius: 4px;
     backdrop-filter: blur(4px);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
 }
 
 /* Initial centered position */
