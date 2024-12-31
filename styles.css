@@ -420,7 +420,7 @@ body {
     margin-bottom: 2rem;
     will-change: opacity;
     opacity: 0;
-    transition: opacity 0.8s ease;
+    transition: opacity 0.3s ease;
     display: block;
     pointer-events: none;
 }
@@ -428,12 +428,6 @@ body {
 .privacy-notice.show {
     opacity: 1;
     pointer-events: auto;
-}
-
-.privacy-notice.fade-out {
-    opacity: 0;
-    transition: opacity 2s ease;
-    pointer-events: none;
 }
 
 #countdown {

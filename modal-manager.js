@@ -49,17 +49,7 @@ class ModalManager {
         console.log('Hiding privacy notice');
         this.state.privacyNoticeVisible = false;
         clearInterval(this.state.countdownInterval);
-        this.elements.privacyNotice.classList.add('fade-out');
-
-        return new Promise(resolve => {
-            const cleanup = () => {
-                this.elements.privacyNotice.classList.remove('show', 'fade-out');
-                resolve();
-            };
-
-            this.elements.privacyNotice.addEventListener('transitionend', cleanup, { once: true });
-            setTimeout(cleanup, 2000); // Fallback
-        });
+        this.elements.privacyNotice.classList.remove('show');
     }
 
     async open(modalType) {
@@ -93,15 +83,6 @@ class ModalManager {
 
     async close(modalType) {
         const modalEl = this._getModalElement(modalType);
-        
-        // Reset any form fields in the modal
-        const inputs = modalEl.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.type === 'text' || input.type === 'password') {
-                input.value = '';
-            }
-        });
-
         modalEl.style.display = 'none';
         
         if (this.state.activeModal === modalType) {
