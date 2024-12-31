@@ -55,13 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideInferenceStatus() {
         const statusEl = document.getElementById('inference-status');
-        statusEl.classList.remove('show');
         clearInterval(timerInterval);
         
-        // Wait for fade out before hiding
+        // Start fade out
+        statusEl.classList.remove('show');
+        
+        // Wait for fade out before removing from DOM
         setTimeout(() => {
             statusEl.style.display = 'none';
-        }, 300);
+        }, 300); // Shorter fade out to prevent visual gap
     }
 
     // Simplified conversation state management
