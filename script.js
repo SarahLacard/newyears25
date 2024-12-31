@@ -28,6 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // API endpoint for the worker
     const API_BASE = 'https://newyears25dataworker.sarah.workers.dev';
 
+    // Common fetch headers
+    const fetchHeaders = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    };
+
     // Context refresh conditions
     function shouldRefreshContext() {
         const timeSinceLastRefresh = Date.now() - conversationState.lastContextRefresh;
@@ -52,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save to Cloudflare
         fetch(`${API_BASE}/api/log`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: fetchHeaders,
+            credentials: 'omit',
             body: JSON.stringify({
                 sessionId: conversationState.sessionId,
                 message,
@@ -124,12 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: fetchHeaders,
+                credentials: 'omit',
                 body: JSON.stringify({ userInput })
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
+                console.error('Error response:', errorText);
                 throw new Error(`Failed to generate responses: ${response.status} - ${response.statusText} - ${errorText}`);
             }
             
@@ -151,14 +160,19 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: fetchHeaders,
+                credentials: 'omit',
                 body: JSON.stringify({ 
                     userInput,
                     selectedModel 
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to generate response');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Failed to generate response: ${response.status} - ${response.statusText} - ${errorText}`);
+            }
             
             const data = await response.json();
             return data.response;
@@ -244,7 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Log DPO data
             fetch(`${API_BASE}/api/dpo`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: fetchHeaders,
+                credentials: 'omit',
                 body: JSON.stringify({
                     sessionId: conversationState.sessionId,
                     userInput: conversationState.messages[conversationState.messages.length - 2].text,
