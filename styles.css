@@ -11,30 +11,6 @@ body {
     overflow: hidden;
 }
 
-.help-trigger {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    width: 1.3rem;
-    height: 1.3rem;
-    border: 2px solid #ffd700;
-    border-radius: 50%;
-    color: #ffd700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    cursor: pointer;
-    background: transparent;
-    transition: all 0.3s ease;
-    z-index: 1002;
-}
-
-.help-trigger:hover {
-    background: #ffd700;
-    color: #1a1a1a;
-}
-
 .chat-container {
     display: flex;
     flex-direction: column;
@@ -199,79 +175,11 @@ body {
 }
 
 .option-box:hover {
-    border-color: #ffd700;
-    transform: translateY(-2px);
+    background: #242424;
 }
 
 .option-box:nth-child(2) {
-    animation-delay: 0.15s;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(26, 26, 26, 0.95);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-content {
-    background-color: #242424;
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid #ff3333;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 0 20px rgba(255, 51, 51, 0.2);
-    text-transform: lowercase;
-}
-
-.close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    color: #ffd700;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: color 0.3s ease;
-}
-
-.close:hover {
-    color: #ff3333;
-}
-
-::placeholder {
-    color: rgba(240, 240, 240, 0.5);
-}
-
-@keyframes slideInLeft {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes optionsAppear {
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-}
-
-@keyframes optionBoxAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    animation-delay: 0.1s;
 }
 
 .token-counter {
@@ -424,5 +332,37 @@ body {
     display: flex;
     justify-content: center;
     transform: none;
+}
+
+::placeholder {
+    color: #666;
+}
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes optionsAppear {
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes optionBoxAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
   

@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const helpTrigger = document.querySelector('.help-trigger');
-    const modal = document.getElementById('helpModal');
-    const closeSpan = document.querySelector('.close');
     const initialInput = document.querySelector('.initial-input-container input');
     const bottomInput = document.querySelector('.bottom-input-container input');
     const initialInputContainer = document.querySelector('.initial-input-container');
@@ -171,23 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialInput.addEventListener('input', (event) => {
         if (event.target.value.length === 1) { // Only trigger on first character
             hidePrivacyNotice();
-        }
-    });
-
-    // Help trigger functionality
-    helpTrigger.addEventListener('click', () => {
-        modal.style.display = 'flex';
-    });
-
-    // Close button functionality
-    closeSpan.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    // Close modal if user clicks outside
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
         }
     });
 
