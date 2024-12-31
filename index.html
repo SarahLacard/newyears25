@@ -9,14 +9,32 @@
 </head>
 <body>
   <div class="help-trigger">?</div>
-  <input type="text" class="input-line" placeholder="Type and press Enter">
+  
+  <div class="chat-container">
+    <div class="messages-container">
+      <!-- Messages will be inserted here -->
+    </div>
+  </div>
+
+  <div class="initial-input-container">
+    <input type="text" class="input-line" placeholder="type and press enter">
+  </div>
+
+  <div class="bottom-input-container">
+    <input type="text" class="input-line" placeholder="type and press enter">
+  </div>
+  
+  <div class="options-container">
+    <div class="option-box">Option 1</div>
+    <div class="option-box">Option 2</div>
+  </div>
 
   <!-- Modal -->
   <div id="helpModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2>Help</h2>
-      <p>Type your message and press Enter to send.</p>
+      <h2>help</h2>
+      <p>type your message and press enter to send.</p>
     </div>
   </div>
 

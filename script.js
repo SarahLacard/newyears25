@@ -2,13 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpTrigger = document.querySelector('.help-trigger');
     const modal = document.getElementById('helpModal');
     const closeSpan = document.querySelector('.close');
-    const input = document.querySelector('.input-line');
+    const initialInput = document.querySelector('.initial-input-container input');
+    const bottomInput = document.querySelector('.bottom-input-container input');
+    const initialInputContainer = document.querySelector('.initial-input-container');
+    const bottomInputContainer = document.querySelector('.bottom-input-container');
+    const messagesContainer = document.querySelector('.messages-container');
+    const optionsContainer = document.querySelector('.options-container');
+    const optionBoxes = document.querySelectorAll('.option-box');
+    
+    let isFirstMessage = true;
 
     // Help trigger functionality
     helpTrigger.addEventListener('click', () => {
         modal.style.display = 'flex';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
     });
 
     // Close button functionality
@@ -23,12 +29,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle input submission
-    input.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            console.log('Input submitted:', input.value);
-            // Add your input handling logic here
-            input.value = '';  // Clear input after submission
+    function addMessage(text, isUser = true) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'response-message'}`;
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+    }
+
+    function showOptions() {
+        optionsContainer.style.display = 'flex';
+        setTimeout(() => {
+            optionsContainer.classList.add('visible');
+            optionBoxes.forEach(box => box.classList.add('visible'));
+        }, 300);
+    }
+
+    // Handle initial input submission
+    initialInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter' && initialInput.value.trim()) {
+            const messageText = initialInput.value;
+            initialInput.value = '';
+            initialInput.disabled = true;
+
+            // Add message immediately
+            addMessage(messageText, true);
+            
+            // Start fade out of input
+            initialInputContainer.classList.add('moved');
+            
+            // Show options after input fades
+            setTimeout(showOptions, 300);
+        }
+    });
+
+    // Handle option selection
+    optionBoxes.forEach(box => {
+        box.addEventListener('click', () => {
+            // Hide options immediately
+            optionsContainer.style.display = 'none';
+            initialInputContainer.classList.add('hidden');
+            
+            // Add response message and show bottom input
+            addMessage(box.textContent, false);
+            bottomInputContainer.classList.add('visible');
+        });
+    });
+
+    // Handle bottom input submission
+    bottomInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter' && bottomInput.value.trim()) {
+            const messageText = bottomInput.value;
+            addMessage(messageText, true);
+            bottomInput.value = '';
         }
     });
 });
