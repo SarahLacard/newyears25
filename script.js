@@ -13,11 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownEl = document.getElementById('countdown');
     const tokenCounter = document.querySelector('.token-counter');
     
-    let countdown = 15;
+    let countdown = 12;
     let timer = null;
     let selectedModel = null;
     let startTime;
     let timerInterval;
+    let countdownInterval;
 
     // Inference status handling
     function showInferenceStatus(inMessage = false) {
@@ -129,37 +130,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Privacy notice handling
-    function showPrivacyNotice() {
-        privacyNotice.classList.add('show');
-        startCountdown();
-    }
-
     function hidePrivacyNotice() {
-        privacyNotice.classList.remove('show');
-        if (timer) {
-            clearInterval(timer);
-            timer = null;
-        }
+        privacyNotice.classList.add('fade-out');
+        setTimeout(() => {
+            privacyNotice.classList.remove('show', 'fade-out');
+        }, 2000);
     }
 
-    function startCountdown() {
-        if (timer) clearInterval(timer);
+    function startPrivacyCountdown() {
+        countdown = 12;
+        countdownEl.textContent = countdown;
         
-        timer = setInterval(() => {
-            countdown--;
-            countdownEl.textContent = countdown;
+        setTimeout(() => {
+            privacyNotice.classList.add('show');
             
-            if (countdown <= 0) {
-                hidePrivacyNotice();
-            }
+            countdownInterval = setInterval(() => {
+                countdown--;
+                countdownEl.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    hidePrivacyNotice();
+                }
+            }, 1000);
         }, 1000);
     }
 
-    // Show privacy notice on load
-    showPrivacyNotice();
+    // Start the countdown when the page loads
+    startPrivacyCountdown();
 
-    // Click anywhere on notice to dismiss
-    privacyNotice.addEventListener('click', hidePrivacyNotice);
+    // Handle click to dismiss
+    privacyNotice.addEventListener('click', () => {
+        clearInterval(countdownInterval);
+        hidePrivacyNotice();
+    });
 
     // Hide privacy notice when typing starts
     initialInput.addEventListener('input', (event) => {

@@ -391,17 +391,22 @@ body {
     width: min(54%, 360px);
     line-height: 2;
     margin-bottom: 2rem;
-    will-change: opacity, transform;
-    display: none;
+    will-change: opacity;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transition: opacity 2s ease;
+    display: block;
     pointer-events: none;
 }
 
 .privacy-notice.show {
-    display: block;
     opacity: 1;
     pointer-events: auto;
+}
+
+.privacy-notice.fade-out {
+    opacity: 0;
+    transition: opacity 2s ease;
+    pointer-events: none;
 }
 
 #countdown {
