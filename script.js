@@ -150,6 +150,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Click anywhere on notice to dismiss
     privacyNotice.addEventListener('click', hidePrivacyNotice);
 
+    // Hide privacy notice when typing starts
+    initialInput.addEventListener('input', (event) => {
+        if (event.target.value.length === 1) { // Only trigger on first character
+            hidePrivacyNotice();
+        }
+    });
+
     // Help trigger functionality
     helpTrigger.addEventListener('click', () => {
         modal.style.display = 'flex';
