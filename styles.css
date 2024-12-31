@@ -31,23 +31,23 @@ body {
 }
 
 .settings-trigger {
+    position: fixed;
     right: 1rem;
-    top: 3rem;
-    border: none;
+    top: 3.5rem;
     width: 1.2rem;
     height: 1.2rem;
     color: #666;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 1002;
 }
 
 .settings-trigger:hover {
-    background: none;
     color: #999;
-    transform: rotate(90deg);
 }
 
 .help-trigger:hover {
@@ -455,14 +455,15 @@ body {
 
 .settings-input {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     background: #1a1a1a;
     border: 1px solid #333;
     border-radius: 4px;
     color: #f0f0f0;
     font-family: 'Inter', monospace;
     font-size: 0.9rem;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .settings-input:focus {
@@ -472,12 +473,13 @@ body {
 
 .save-confirmation {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
+    top: 1.1rem;
+    left: 2rem;
     color: #4CAF50;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     opacity: 0;
     transition: opacity 0.3s ease;
+    text-transform: none;
 }
 
 .save-confirmation.show {
@@ -487,6 +489,9 @@ body {
 .settings-modal {
     width: 80vw;
     max-width: 800px;
-    padding: 1.5rem;
+    padding: 3rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
   
