@@ -271,8 +271,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Store selected model for continued conversation
             selectedModel = selectedBox.dataset.model;
             
-            // Add response message first
-            const responseMessage = await addMessage('helper', selectedBox.textContent, Math.ceil(selectedBox.textContent.length / 4));
+            // Create and display the message div first
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message response-message';
+            messageDiv.textContent = selectedBox.dataset.content;
+            messagesContainer.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // Add response message to state
+            const responseMessage = await addMessage('helper', selectedBox.dataset.content, Math.ceil(selectedBox.dataset.content.length / 4));
             
             // Now we can safely access the last user message
             const lastUserMessage = conversationState.messages
@@ -306,12 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Show token counter
             tokenCounter.classList.add('visible');
-            
-            // Scroll to the latest message
-            const messageDiv = messagesContainer.lastElementChild;
-            if (messageDiv) {
-                messageDiv.scrollIntoView({ behavior: 'smooth' });
-            }
         });
     });
 
