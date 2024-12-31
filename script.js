@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         conversationState.tokenCount += tokenUsage;
         updateTokenDisplay();
         
-        // Save to Cloudflare
+        // Save complete conversation state
         try {
             await fetch(`${API_BASE}/api/log`, {
                 method: 'POST',
@@ -64,17 +64,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'omit',
                 body: JSON.stringify({
                     sessionId: conversationState.sessionId,
-                    message,
-                    tokenCount: conversationState.tokenCount,
-                    messages: conversationState.messages // Send full conversation context
+                    messages: conversationState.messages,
+                    tokenCount: conversationState.tokenCount
                 })
             });
-            console.log('Message logged successfully:', message);
+            console.log(`Updated conversation ${conversationState.sessionId}, messages: ${conversationState.messages.length}`);
         } catch (error) {
-            console.error('Error logging message:', error);
+            console.error('Error updating conversation:', error);
         }
         
-        return message; // Return the message for immediate use
+        return message;
     }
 
     // Update token counter display
@@ -253,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayMessage("I apologize, but I'm having trouble generating responses right now. Please try again.", false);
                 initialInput.disabled = false;
                 initialInputContainer.classList.remove('moved');
+                initialInput.focus(); // Maintain focus on error
             }
         }
     });
@@ -336,6 +336,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             bottomInput.disabled = false;
+            bottomInput.focus(); // Maintain focus after response
+        }
+    });
+
+    // Add window unload handler to mark conversation as complete
+    window.addEventListener('beforeunload', async () => {
+        if (conversationState.messages.length > 0) {
+            try {
+                await fetch(`${API_BASE}/api/complete`, {
+                    method: 'POST',
+                    headers: fetchHeaders,
+                    credentials: 'omit',
+                    body: JSON.stringify({
+                        sessionId: conversationState.sessionId
+                    }),
+                    // Use keepalive to ensure the request completes
+                    keepalive: true
+                });
+            } catch (error) {
+                console.error('Error marking conversation complete:', error);
+            }
         }
     });
 });
