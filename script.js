@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const privacyNotice = document.getElementById('privacyNotice');
     const countdownEl = document.getElementById('countdown');
     const tokenCounter = document.querySelector('.token-counter');
+    const sessionIdDisplay = document.querySelector('.session-id');
     
     let countdown = 12;
     let timer = null;
@@ -89,17 +90,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return messagesSinceLastRefresh > 10 || timeSinceLastRefresh > 5 * 60 * 1000;
     }
 
-    // Message handling with token tracking
+    // Update token counter display with flash animation
+    function updateTokenDisplay() {
+        const count = conversationState.tokenCount;
+        const formattedCount = count.toString().padStart(6, '0').replace(/(\d{3})$/, ',$1');
+        tokenCounter.textContent = `${formattedCount} / 1,000,000`;
+        tokenCounter.classList.add('visible');
+        sessionIdDisplay.textContent = `session: ${conversationState.sessionId}`;
+        sessionIdDisplay.classList.add('visible');
+        
+        // Add flash animation
+        tokenCounter.classList.remove('flash');
+        void tokenCounter.offsetWidth; // Force reflow
+        tokenCounter.classList.add('flash');
+    }
+
+    // Calculate conversation context tokens
+    function calculateContextTokens() {
+        return conversationState.messages.reduce((total, msg) => total + msg.text.length, 0);
+    }
+
+    // Message handling with character counting
     async function addMessage(speaker, text, tokenUsage = 0) {
         const message = {
             speaker,
             text,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            charCount: text.length
         };
         
         // Add to state
         conversationState.messages.push(message);
-        conversationState.tokenCount += tokenUsage;
+        conversationState.tokenCount = calculateContextTokens();
         updateTokenDisplay();
         
         // Save complete conversation state
@@ -114,18 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     tokenCount: conversationState.tokenCount
                 })
             });
-            console.log(`Updated conversation ${conversationState.sessionId}, messages: ${conversationState.messages.length}`);
+            console.log(`Updated conversation ${conversationState.sessionId}, messages: ${conversationState.messages.length}, total chars: ${conversationState.tokenCount}`);
         } catch (error) {
             console.error('Error updating conversation:', error);
         }
         
         return message;
-    }
-
-    // Update token counter display
-    function updateTokenDisplay() {
-        const formattedCount = conversationState.tokenCount.toString().padStart(6, '0');
-        tokenCounter.textContent = `${formattedCount} / 1,000,000`;
     }
 
     // Privacy notice handling
@@ -215,14 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function continueConversation(userInput) {
         try {
-            showInferenceStatus(true); // Show in message area for continued conversation
+            showInferenceStatus(true);
+            
+            // Calculate context tokens
+            const contextChars = calculateContextTokens();
+            console.log(`Sending message with context size: ${contextChars} chars`);
+            
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
                 headers: fetchHeaders,
                 credentials: 'omit',
                 body: JSON.stringify({ 
                     userInput,
-                    selectedModel 
+                    selectedModel,
+                    contextSize: contextChars
                 })
             });
 
@@ -233,26 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const data = await response.json();
-            
-            // Start the fade out
             hideInferenceStatus();
-            
-            // Wait for fade out before showing response
             await new Promise(resolve => setTimeout(resolve, 500));
             
             if (data.response) {
-                // Transform the loading message into the response
-                const statusEl = document.getElementById('inference-status');
-                statusEl.classList.add('response');
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'response-content';
-                contentDiv.textContent = data.response;
-                statusEl.appendChild(contentDiv);
-
-                // Add to conversation state
-                const estimatedTokens = Math.ceil(data.response.length / 4);
-                await addMessage('helper', data.response, estimatedTokens);
-                
+                displayMessage(data.response, false);
                 return data.response;
             } else {
                 throw new Error('No response in data');
@@ -285,8 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Handle initial input submission
-    initialInput.addEventListener('keypress', async (event) => {
-        if (event.key === 'Enter' && initialInput.value.trim()) {
+    const initialForm = initialInput.closest('form');
+    initialForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (initialInput.value.trim()) {
             const userInput = initialInput.value.trim();
             initialInput.value = '';
             initialInput.disabled = true;
@@ -320,6 +329,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 initialInputContainer.classList.remove('moved');
                 initialInput.focus(); // Maintain focus on error
             }
+        }
+    });
+
+    // Handle bottom input submission
+    const bottomForm = bottomInput.closest('form');
+    bottomForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (bottomInput.value.trim()) {
+            const userInput = bottomInput.value.trim();
+            bottomInput.value = '';
+            bottomInput.disabled = true;
+
+            // Display user message
+            displayMessage(userInput, true);
+            
+            // Generate response using selected model
+            const response = await continueConversation(userInput);
+            
+            if (!response) {
+                displayMessage("I apologize, but I'm having trouble generating a response right now. Please try again.", false);
+            }
+            
+            bottomInput.disabled = false;
+            bottomInput.focus(); // Maintain focus after response
+        }
+    });
+
+    // Keep the keypress handlers for desktop
+    initialInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent double submission
+            initialForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    bottomInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent double submission
+            bottomForm.dispatchEvent(new Event('submit'));
         }
     });
 
@@ -380,30 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show token counter
             tokenCounter.classList.add('visible');
         });
-    });
-
-    // Handle bottom input submission
-    bottomInput.addEventListener('keypress', async (event) => {
-        if (event.key === 'Enter' && bottomInput.value.trim()) {
-            const userInput = bottomInput.value.trim();
-            bottomInput.value = '';
-            bottomInput.disabled = true;
-
-            // Display user message
-            displayMessage(userInput, true);
-            
-            // Generate response using selected model
-            const response = await continueConversation(userInput);
-            
-            if (response) {
-                displayMessage(response, false);
-            } else {
-                displayMessage("I apologize, but I'm having trouble generating a response right now. Please try again.", false);
-            }
-            
-            bottomInput.disabled = false;
-            bottomInput.focus(); // Maintain focus after response
-        }
     });
 
     // Add window unload handler to mark conversation as complete
