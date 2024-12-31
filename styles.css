@@ -31,17 +31,18 @@ body {
 }
 
 .settings-trigger {
-    right: 3rem;
-    border-color: #666;
+    right: 1rem;
+    top: 3rem;
+    border: none;
+    width: auto;
+    height: auto;
     color: #666;
-    font-family: 'Inter', monospace;
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .settings-trigger:hover {
-    background: #666;
-    color: #1a1a1a;
-    border-color: #666;
+    background: none;
+    color: #999;
 }
 
 .help-trigger:hover {
