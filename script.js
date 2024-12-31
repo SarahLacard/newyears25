@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showInferenceStatus(true); // Show in message area for continued conversation
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
-                headers: fetchHeaders,
+                headers: getHeaders(),
                 credentials: 'omit',
                 body: JSON.stringify({ 
                     userInput,
@@ -318,14 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await new Promise(resolve => setTimeout(resolve, 500));
             
             if (data.response) {
-                // Transform the loading message into the response
-                const statusEl = document.getElementById('inference-status');
-                statusEl.classList.add('response');
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'response-content';
-                contentDiv.textContent = data.response;
-                statusEl.appendChild(contentDiv);
-
                 // Add to conversation state
                 const estimatedTokens = Math.ceil(data.response.length / 4);
                 await addMessage('helper', data.response, estimatedTokens);
