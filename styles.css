@@ -279,8 +279,8 @@ body {
 .inference-status {
     display: none; /* hidden by default, shown during generation */
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 902;
     align-items: center;
     gap: 0.5rem;
@@ -288,6 +288,20 @@ body {
     font-size: 0.75rem;
     color: #ffd700;
     animation: slideInLeft 0.3s ease forwards;
+    padding: 0.5rem 1rem;
+    background: rgba(26, 26, 26, 0.8);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+}
+
+/* Position for initial input */
+.initial-input-container:not(.moved) ~ .inference-status {
+    bottom: calc(50% + 60px); /* Above the centered input */
+}
+
+/* Position for bottom input */
+.initial-input-container.moved ~ .inference-status {
+    bottom: 120px; /* Above the bottom input */
 }
 
 .spinner {
