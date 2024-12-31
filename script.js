@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // API endpoint for the worker
-    const API_BASE = 'https://newyears25dataworker.sarah.workers.dev';
+    const API_BASE = 'https://newyears25dataworker.sarahlacard.workers.dev';
 
     // Common fetch headers
     const fetchHeaders = {
@@ -126,19 +126,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function generateResponses(userInput) {
         try {
-            console.log('Sending request to:', `${API_BASE}/api/generate`);
+            const requestUrl = `${API_BASE}/api/generate`;
+            console.log('Sending request to:', requestUrl);
+            console.log('Request headers:', fetchHeaders);
             console.log('Request body:', { userInput });
             
-            const response = await fetch(`${API_BASE}/api/generate`, {
+            const response = await fetch(requestUrl, {
                 method: 'POST',
                 headers: fetchHeaders,
                 credentials: 'omit',
                 body: JSON.stringify({ userInput })
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', Object.fromEntries(response.headers));
+
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('Error response:', errorText);
+                console.error('Error response text:', errorText);
                 throw new Error(`Failed to generate responses: ${response.status} - ${response.statusText} - ${errorText}`);
             }
             
@@ -146,12 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Response data:', data);
             
             if (!data.responses || !Array.isArray(data.responses) || data.responses.length !== 2) {
+                console.error('Invalid response format:', data);
                 throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
             }
             
             return data.responses;
         } catch (error) {
             console.error('Error generating responses:', error);
+            console.error('Error stack:', error.stack);
             return null;
         }
     }
