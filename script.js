@@ -180,9 +180,22 @@ document.addEventListener('DOMContentLoaded', () => {
         hidePrivacyNotice();
     });
 
-    // Hide privacy notice when typing starts
-    initialInput.addEventListener('input', (event) => {
-        if (event.target.value.length === 1) { // Only trigger on first character
+    // Hide privacy notice when typing starts or input is focused
+    initialInput.addEventListener('input', () => {
+        hidePrivacyNotice();
+    });
+
+    initialInput.addEventListener('focus', () => {
+        hidePrivacyNotice();
+    });
+
+    initialInput.addEventListener('touchstart', () => {
+        hidePrivacyNotice();
+    });
+
+    // Also hide on keyboard showing (mobile)
+    window.addEventListener('resize', () => {
+        if (document.activeElement === initialInput) {
             hidePrivacyNotice();
         }
     });
@@ -283,7 +296,15 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.className = `message ${isUser ? 'user-message' : 'response-message'}`;
         messageDiv.textContent = text;
         messagesContainer.appendChild(messageDiv);
-        messageDiv.scrollIntoView({ behavior: 'smooth' });
+        
+        // Smooth scroll with a small delay to ensure proper positioning
+        setTimeout(() => {
+            const scrollTarget = messageDiv.offsetTop - 100; // Add some padding from top
+            window.scrollTo({
+                top: scrollTarget,
+                behavior: 'smooth'
+            });
+        }, 100);
 
         // Add to conversation state
         const speaker = isUser ? 'user' : 'helper';
