@@ -207,8 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Settings trigger functionality
     const settingsTrigger = document.createElement('div');
     settingsTrigger.className = 'help-trigger settings-trigger';
-    settingsTrigger.textContent = 'S';
-    settingsTrigger.style.left = '1rem';
+    settingsTrigger.innerHTML = '⚙';
     document.body.appendChild(settingsTrigger);
 
     settingsTrigger.addEventListener('click', () => {

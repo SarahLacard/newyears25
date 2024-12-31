@@ -30,6 +30,20 @@ body {
     z-index: 1002;
 }
 
+.settings-trigger {
+    right: 3rem;
+    border-color: #666;
+    color: #666;
+    font-family: 'Inter', monospace;
+    font-size: 1rem;
+}
+
+.settings-trigger:hover {
+    background: #666;
+    color: #1a1a1a;
+    border-color: #666;
+}
+
 .help-trigger:hover {
     background: #ffd700;
     color: #1a1a1a;
