@@ -262,18 +262,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Store selected model for continued conversation
             selectedModel = selectedBox.dataset.model;
             
-            // Log DPO data
-            fetch(`${API_BASE}/api/dpo`, {
-                method: 'POST',
-                headers: fetchHeaders,
-                credentials: 'omit',
-                body: JSON.stringify({
-                    sessionId: conversationState.sessionId,
-                    userInput: conversationState.messages[conversationState.messages.length - 2].text,
-                    chosenResponse: selectedBox.dataset.content,
-                    rejectedResponse: rejectedBox.dataset.content
-                })
-            }).catch(console.error);
+            // Find the last user message
+            const lastUserMessage = conversationState.messages
+                .filter(m => m.speaker === 'user')
+                .pop();
+
+            if (lastUserMessage) {
+                // Log DPO data
+                fetch(`${API_BASE}/api/dpo`, {
+                    method: 'POST',
+                    headers: fetchHeaders,
+                    credentials: 'omit',
+                    body: JSON.stringify({
+                        sessionId: conversationState.sessionId,
+                        userInput: lastUserMessage.text,
+                        chosenResponse: selectedBox.dataset.content,
+                        rejectedResponse: rejectedBox.dataset.content
+                    })
+                }).catch(console.error);
+            }
             
             // Add response message and show bottom input
             displayMessage(selectedBox.textContent, false);
