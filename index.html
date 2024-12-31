@@ -5,19 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>lacard.dev Minimal Site</title>
   <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello from lacard.dev</h1>
-  
-  <!-- Button to open modal -->
-  <button id="openModal">Settings</button>
+  <div class="help-trigger">?</div>
+  <input type="text" class="input-line" placeholder="Type and press Enter">
 
   <!-- Modal -->
-  <div id="myModal" class="modal">
+  <div id="helpModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2>My Modal</h2>
-      <p>Some settings or info here.</p>
+      <h2>Help</h2>
+      <p>Type your message and press Enter to send.</p>
     </div>
   </div>
 
