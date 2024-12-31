@@ -106,21 +106,28 @@ body {
 
 .bottom-input-container {
     position: fixed;
-    bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
     display: flex;
     justify-content: center;
     padding: 2rem;
     background: linear-gradient(to top, #1a1a1a 80%, transparent);
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    top: 50%;
 }
 
 .bottom-input-container.visible {
     opacity: 1;
-    transform: translateY(0);
+    pointer-events: auto;
+    top: 100%;
+    transform: translate(-50%, -100%);
+}
+
+.bottom-input-container.visible .input-line {
+    box-shadow: 0 -4px 12px rgba(255, 51, 51, 0.1);
 }
 
 .input-line {
