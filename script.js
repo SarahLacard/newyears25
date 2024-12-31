@@ -15,6 +15,57 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let countdown = 15;
     let timer = null;
+    let selectedModel = null;
+
+    // Simplified conversation state management
+    const conversationState = {
+        sessionId: crypto.randomUUID(),
+        startTime: new Date().toISOString(),
+        messages: [],
+        tokenCount: 0
+    };
+
+    // API endpoint for the worker
+    const API_BASE = 'https://newyears25dataworker.sarah.workers.dev';
+
+    // Context refresh conditions
+    function shouldRefreshContext() {
+        const timeSinceLastRefresh = Date.now() - conversationState.lastContextRefresh;
+        const messagesSinceLastRefresh = conversationState.messages
+            .filter(m => m.timestamp > conversationState.lastContextRefresh).length;
+        
+        return messagesSinceLastRefresh > 10 || timeSinceLastRefresh > 5 * 60 * 1000;
+    }
+
+    // Message handling with token tracking
+    function addMessage(speaker, text, tokenUsage = 0) {
+        const message = {
+            speaker,
+            text,
+            timestamp: Date.now()
+        };
+        
+        conversationState.messages.push(message);
+        conversationState.tokenCount += tokenUsage;
+        updateTokenDisplay();
+        
+        // Save to Cloudflare
+        fetch(`${API_BASE}/api/log`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: conversationState.sessionId,
+                message,
+                tokenCount: conversationState.tokenCount
+            })
+        }).catch(console.error);
+    }
+
+    // Update token counter display
+    function updateTokenDisplay() {
+        const formattedCount = conversationState.tokenCount.toString().padStart(6, '0');
+        tokenCounter.textContent = `${formattedCount} / 1,000,000`;
+    }
 
     // Privacy notice handling
     function showPrivacyNotice() {
@@ -66,11 +117,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function addMessage(text, isUser = true) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user-message' : 'response-message'}`;
-        messageDiv.textContent = text;
-        messagesContainer.appendChild(messageDiv);
+    async function generateResponses(userInput) {
+        try {
+            console.log('Sending request to:', `${API_BASE}/api/generate`);
+            console.log('Request body:', { userInput });
+            
+            const response = await fetch(`${API_BASE}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userInput })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to generate responses: ${response.status} - ${response.statusText} - ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            if (!data.responses || !Array.isArray(data.responses) || data.responses.length !== 2) {
+                throw new Error(`Invalid response format: ${JSON.stringify(data)}`);
+            }
+            
+            return data.responses;
+        } catch (error) {
+            console.error('Error generating responses:', error);
+            return null;
+        }
+    }
+
+    async function continueConversation(userInput) {
+        try {
+            const response = await fetch(`${API_BASE}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    userInput,
+                    selectedModel 
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to generate response');
+            
+            const data = await response.json();
+            return data.response;
+        } catch (error) {
+            console.error('Error generating response:', error);
+            return null;
+        }
     }
 
     function showOptions() {
@@ -81,33 +176,85 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
+    function displayMessage(text, isUser = true) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'response-message'}`;
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+
+        // Add to conversation state
+        const speaker = isUser ? 'user' : 'helper';
+        const estimatedTokens = Math.ceil(text.length / 4);
+        addMessage(speaker, text, estimatedTokens);
+    }
+
     // Handle initial input submission
-    initialInput.addEventListener('keypress', (event) => {
+    initialInput.addEventListener('keypress', async (event) => {
         if (event.key === 'Enter' && initialInput.value.trim()) {
-            const messageText = initialInput.value;
+            const userInput = initialInput.value.trim();
             initialInput.value = '';
             initialInput.disabled = true;
 
-            // Add message immediately
-            addMessage(messageText, true);
+            // Display user message
+            displayMessage(userInput, true);
             
             // Start fade out of input
             initialInputContainer.classList.add('moved');
             
-            // Show options after input fades
-            setTimeout(showOptions, 300);
+            // Generate responses
+            const responses = await generateResponses(userInput);
+            
+            if (responses) {
+                // Update option boxes with generated responses
+                optionBoxes[0].textContent = responses[0].content;
+                optionBoxes[1].textContent = responses[1].content;
+                
+                // Store responses for DPO logging
+                optionBoxes[0].dataset.model = responses[0].model;
+                optionBoxes[1].dataset.model = responses[1].model;
+                optionBoxes[0].dataset.content = responses[0].content;
+                optionBoxes[1].dataset.content = responses[1].content;
+                
+                // Show options after input fades
+                setTimeout(showOptions, 300);
+            } else {
+                // Handle error
+                displayMessage("I apologize, but I'm having trouble generating responses right now. Please try again.", false);
+                initialInput.disabled = false;
+                initialInputContainer.classList.remove('moved');
+            }
         }
     });
 
     // Handle option selection
-    optionBoxes.forEach(box => {
-        box.addEventListener('click', () => {
+    optionBoxes.forEach((box, index) => {
+        box.addEventListener('click', async () => {
             // Hide options immediately
             optionsContainer.style.display = 'none';
             initialInputContainer.classList.add('hidden');
             
+            // Get the selected and rejected responses
+            const selectedBox = box;
+            const rejectedBox = optionBoxes[index === 0 ? 1 : 0];
+            
+            // Store selected model for continued conversation
+            selectedModel = selectedBox.dataset.model;
+            
+            // Log DPO data
+            fetch(`${API_BASE}/api/dpo`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: conversationState.sessionId,
+                    userInput: conversationState.messages[conversationState.messages.length - 2].text,
+                    chosenResponse: selectedBox.dataset.content,
+                    rejectedResponse: rejectedBox.dataset.content
+                })
+            }).catch(console.error);
+            
             // Add response message and show bottom input
-            addMessage(box.textContent, false);
+            displayMessage(selectedBox.textContent, false);
             bottomInputContainer.classList.add('visible');
             
             // Show token counter
@@ -116,11 +263,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Handle bottom input submission
-    bottomInput.addEventListener('keypress', (event) => {
+    bottomInput.addEventListener('keypress', async (event) => {
         if (event.key === 'Enter' && bottomInput.value.trim()) {
-            const messageText = bottomInput.value;
-            addMessage(messageText, true);
+            const userInput = bottomInput.value.trim();
             bottomInput.value = '';
+            bottomInput.disabled = true;
+
+            // Display user message
+            displayMessage(userInput, true);
+            
+            // Generate response using selected model
+            const response = await continueConversation(userInput);
+            
+            if (response) {
+                displayMessage(response, false);
+            } else {
+                displayMessage("I apologize, but I'm having trouble generating a response right now. Please try again.", false);
+            }
+            
+            bottomInput.disabled = false;
         }
     });
 });
