@@ -175,10 +175,10 @@ body::-webkit-scrollbar {
     top: 40%;
     transform: translate(-50%, -50%);
     display: none;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 1rem;
+    padding: 1rem;
     opacity: 0;
-    width: calc(100% - 8rem);
+    width: calc(100% - 2rem);
     max-width: 500px;
     justify-content: center;
     flex-direction: row;
@@ -191,8 +191,8 @@ body::-webkit-scrollbar {
 }
 
 .option-box {
-    flex: 0 1 auto;
-    padding: 1.5rem 2rem;
+    flex: 1 1 auto;
+    padding: 1rem 1.5rem;
     background-color: #242424;
     border: 1px solid #ff3333;
     border-radius: 8px;
@@ -201,9 +201,27 @@ body::-webkit-scrollbar {
     opacity: 0;
     transform: translateY(20px);
     text-align: center;
-    min-width: 120px;
-    max-width: 200px;
-    width: 100%;
+    min-width: 100px;
+    max-width: 180px;
+    width: calc(50% - 1rem);
+    font-size: 0.9rem;
+    margin: 0 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .options-container {
+        width: calc(100% - 1rem);
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .option-box {
+        padding: 0.75rem 1rem;
+        margin: 0 0.25rem;
+        font-size: 0.85rem;
+        min-width: 80px;
+        max-width: 160px;
+    }
 }
 
 .option-box.visible {
