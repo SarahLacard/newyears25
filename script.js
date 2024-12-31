@@ -16,6 +16,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let countdown = 15;
     let timer = null;
     let selectedModel = null;
+    let startTime;
+    let timerInterval;
+
+    // Inference status handling
+    function showInferenceStatus() {
+        const statusEl = document.getElementById('inference-status');
+        const timerEl = document.getElementById('timer');
+
+        statusEl.style.display = 'flex';
+        startTime = performance.now();
+
+        timerInterval = setInterval(() => {
+            const elapsed = performance.now() - startTime;
+            timerEl.textContent = (elapsed / 1000).toFixed(1) + 's';
+        }, 100);
+    }
+
+    function hideInferenceStatus() {
+        const statusEl = document.getElementById('inference-status');
+        statusEl.style.display = 'none';
+        clearInterval(timerInterval);
+    }
 
     // Simplified conversation state management
     const conversationState = {
@@ -134,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function generateResponses(userInput) {
         try {
+            showInferenceStatus();
             const requestUrl = `${API_BASE}/api/generate`;
             console.log('Sending request to:', requestUrl);
             console.log('Request headers:', fetchHeaders);
@@ -168,11 +191,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error generating responses:', error);
             console.error('Error stack:', error.stack);
             return null;
+        } finally {
+            hideInferenceStatus();
         }
     }
 
     async function continueConversation(userInput) {
         try {
+            showInferenceStatus();
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
                 headers: fetchHeaders,
@@ -194,6 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error generating response:', error);
             return null;
+        } finally {
+            hideInferenceStatus();
         }
     }
 
