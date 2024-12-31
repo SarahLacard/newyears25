@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const privacyNotice = document.getElementById('privacyNotice');
     const countdownEl = document.getElementById('countdown');
     const tokenCounter = document.querySelector('.token-counter');
+    const settingsModal = document.getElementById('settingsModal');
+    const settingsClose = document.querySelector('.settings-close');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveConfirmation = document.getElementById('save-confirmation');
     
     let countdown = 12;
     let timer = null;
@@ -189,19 +193,73 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target === modal) {
             modal.style.display = 'none';
         }
+        if (event.target === settingsModal) {
+            settingsModal.style.display = 'none';
+        }
     });
+
+    // Load existing API key if any
+    const savedApiKey = localStorage.getItem('openaiApiKey');
+    if (savedApiKey) {
+        apiKeyInput.value = savedApiKey;
+    }
+
+    // Settings trigger functionality
+    const settingsTrigger = document.createElement('div');
+    settingsTrigger.className = 'help-trigger settings-trigger';
+    settingsTrigger.textContent = 'S';
+    settingsTrigger.style.left = '1rem';
+    document.body.appendChild(settingsTrigger);
+
+    settingsTrigger.addEventListener('click', () => {
+        settingsModal.style.display = 'flex';
+    });
+
+    // Close settings modal
+    settingsClose.addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
+
+    // Save API key on paste
+    apiKeyInput.addEventListener('paste', (event) => {
+        setTimeout(() => {
+            const pastedValue = apiKeyInput.value.trim();
+            if (pastedValue) {
+                localStorage.setItem('openaiApiKey', pastedValue);
+                saveConfirmation.classList.add('show');
+                setTimeout(() => {
+                    saveConfirmation.classList.remove('show');
+                }, 2000);
+            }
+        }, 50);
+    });
+
+    // Update fetch headers to include API key if present
+    function getHeaders() {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+        
+        const apiKey = localStorage.getItem('openaiApiKey');
+        if (apiKey) {
+            headers['X-OpenAI-Key'] = apiKey;
+        }
+        
+        return headers;
+    }
 
     async function generateResponses(userInput) {
         try {
-            showInferenceStatus(false); // Show in center for initial response
+            showInferenceStatus(false);
             const requestUrl = `${API_BASE}/api/generate`;
             console.log('Sending request to:', requestUrl);
-            console.log('Request headers:', fetchHeaders);
+            console.log('Request headers:', getHeaders());
             console.log('Request body:', { userInput });
             
             const response = await fetch(requestUrl, {
                 method: 'POST',
-                headers: fetchHeaders,
+                headers: getHeaders(),
                 credentials: 'omit',
                 body: JSON.stringify({ userInput })
             });

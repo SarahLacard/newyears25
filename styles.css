@@ -425,4 +425,40 @@ body {
     justify-content: center;
     transform: none;
 }
+
+.settings-section {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-input {
+    width: 100%;
+    padding: 0.5rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #f0f0f0;
+    font-family: 'Inter', monospace;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: #ffd700;
+}
+
+.save-confirmation {
+    color: #4CAF50;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.save-confirmation.show {
+    opacity: 1;
+}
   
