@@ -160,7 +160,7 @@ body {
 .options-container {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: 40%;
     transform: translate(-50%, -50%);
     display: none;
     gap: 2rem;
@@ -169,7 +169,7 @@ body {
     width: calc(100% - 8rem);
     max-width: 500px;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
 }
 
