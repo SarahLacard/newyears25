@@ -287,16 +287,17 @@ body {
     background: rgba(26, 26, 26, 0.8);
     border-radius: 4px;
     backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 /* Initial centered position */
 .inference-status.initial {
     position: fixed;
     left: 50%;
-    top: 40%; /* Slightly above center */
+    top: 40%;
     transform: translate(-50%, -50%);
     z-index: 902;
-    animation: slideInLeft 0.3s ease forwards;
 }
 
 /* Message-style position */
@@ -307,8 +308,13 @@ body {
     border-radius: 8px;
     background-color: #242424;
     border-right: 3px solid #ffd700;
-    animation: slideInRight 0.5s ease forwards;
     margin: 1rem 2rem;
+    transform: translateX(50px);
+    animation: slideInRight 0.5s ease forwards;
+}
+
+.inference-status.show {
+    opacity: 1;
 }
 
 .spinner {

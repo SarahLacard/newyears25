@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timerEl = document.getElementById('timer');
 
         // Reset classes
-        statusEl.classList.remove('initial', 'in-message');
+        statusEl.classList.remove('initial', 'in-message', 'show');
         
         if (inMessage) {
             // Add to messages container
@@ -40,16 +40,27 @@ document.addEventListener('DOMContentLoaded', () => {
         statusEl.style.display = 'flex';
         startTime = performance.now();
 
+        // Start timer updates
         timerInterval = setInterval(() => {
             const elapsed = performance.now() - startTime;
             timerEl.textContent = (elapsed / 1000).toFixed(1) + 's';
         }, 100);
+
+        // Trigger fade in
+        requestAnimationFrame(() => {
+            statusEl.classList.add('show');
+        });
     }
 
     function hideInferenceStatus() {
         const statusEl = document.getElementById('inference-status');
-        statusEl.style.display = 'none';
+        statusEl.classList.remove('show');
         clearInterval(timerInterval);
+        
+        // Wait for fade out before hiding
+        setTimeout(() => {
+            statusEl.style.display = 'none';
+        }, 300);
     }
 
     // Simplified conversation state management
