@@ -27,6 +27,7 @@ body {
     cursor: pointer;
     background: transparent;
     transition: all 0.3s ease;
+    z-index: 1002;
 }
 
 .help-trigger:hover {
@@ -89,7 +90,7 @@ body {
     width: 100%;
     max-width: 800px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     z-index: 10;
     opacity: 1;
 }
@@ -124,7 +125,7 @@ body {
 
 .input-line {
     width: 300px;
-    padding: 0.5rem 0;
+    padding: 0.5rem 1rem;
     background: transparent;
     border: none;
     border-bottom: 2px solid #ff3333;
@@ -251,5 +252,71 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.token-counter {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.65rem;
+    font-family: 'Inter', monospace;
+    color: rgba(240, 240, 240, 0.3);
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    z-index: 901;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.token-counter.visible {
+    opacity: 1;
+}
+
+.privacy-notice {
+    position: fixed;
+    top: min(25%, 180px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #242424;
+    color: #f0f0f0;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    z-index: 1001;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #ff3333;
+    width: min(54%, 360px);
+    line-height: 2;
+    margin-bottom: 2rem;
+    will-change: opacity, transform;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.privacy-notice.show {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#countdown {
+    color: #ffd700;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    transform: none;
 }
   

@@ -9,8 +9,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesContainer = document.querySelector('.messages-container');
     const optionsContainer = document.querySelector('.options-container');
     const optionBoxes = document.querySelectorAll('.option-box');
+    const privacyNotice = document.getElementById('privacyNotice');
+    const countdownEl = document.getElementById('countdown');
+    const tokenCounter = document.querySelector('.token-counter');
     
-    let isFirstMessage = true;
+    let countdown = 15;
+    let timer = null;
+
+    // Privacy notice handling
+    function showPrivacyNotice() {
+        privacyNotice.classList.add('show');
+        startCountdown();
+    }
+
+    function hidePrivacyNotice() {
+        privacyNotice.classList.remove('show');
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    function startCountdown() {
+        if (timer) clearInterval(timer);
+        
+        timer = setInterval(() => {
+            countdown--;
+            countdownEl.textContent = countdown;
+            
+            if (countdown <= 0) {
+                hidePrivacyNotice();
+            }
+        }, 1000);
+    }
+
+    // Show privacy notice on load
+    showPrivacyNotice();
+
+    // Click anywhere on notice to dismiss
+    privacyNotice.addEventListener('click', hidePrivacyNotice);
 
     // Help trigger functionality
     helpTrigger.addEventListener('click', () => {
@@ -72,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add response message and show bottom input
             addMessage(box.textContent, false);
             bottomInputContainer.classList.add('visible');
+            
+            // Show token counter
+            tokenCounter.classList.add('visible');
         });
     });
 
