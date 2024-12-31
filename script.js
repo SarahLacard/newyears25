@@ -44,28 +44,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Message handling with token tracking
-    function addMessage(speaker, text, tokenUsage = 0) {
+    async function addMessage(speaker, text, tokenUsage = 0) {
         const message = {
             speaker,
             text,
             timestamp: Date.now()
         };
         
+        // Add to state
         conversationState.messages.push(message);
         conversationState.tokenCount += tokenUsage;
         updateTokenDisplay();
         
         // Save to Cloudflare
-        fetch(`${API_BASE}/api/log`, {
-            method: 'POST',
-            headers: fetchHeaders,
-            credentials: 'omit',
-            body: JSON.stringify({
-                sessionId: conversationState.sessionId,
-                message,
-                tokenCount: conversationState.tokenCount
-            })
-        }).catch(console.error);
+        try {
+            await fetch(`${API_BASE}/api/log`, {
+                method: 'POST',
+                headers: fetchHeaders,
+                credentials: 'omit',
+                body: JSON.stringify({
+                    sessionId: conversationState.sessionId,
+                    message,
+                    tokenCount: conversationState.tokenCount,
+                    messages: conversationState.messages // Send full conversation context
+                })
+            });
+            console.log('Message logged successfully:', message);
+        } catch (error) {
+            console.error('Error logging message:', error);
+        }
+        
+        return message; // Return the message for immediate use
     }
 
     // Update token counter display
@@ -262,32 +271,47 @@ document.addEventListener('DOMContentLoaded', () => {
             // Store selected model for continued conversation
             selectedModel = selectedBox.dataset.model;
             
-            // Find the last user message
+            // Add response message first
+            const responseMessage = await addMessage('helper', selectedBox.textContent, Math.ceil(selectedBox.textContent.length / 4));
+            
+            // Now we can safely access the last user message
             const lastUserMessage = conversationState.messages
                 .filter(m => m.speaker === 'user')
                 .pop();
 
             if (lastUserMessage) {
-                // Log DPO data
-                fetch(`${API_BASE}/api/dpo`, {
-                    method: 'POST',
-                    headers: fetchHeaders,
-                    credentials: 'omit',
-                    body: JSON.stringify({
-                        sessionId: conversationState.sessionId,
-                        userInput: lastUserMessage.text,
-                        chosenResponse: selectedBox.dataset.content,
-                        rejectedResponse: rejectedBox.dataset.content
-                    })
-                }).catch(console.error);
+                try {
+                    // Log DPO data
+                    await fetch(`${API_BASE}/api/dpo`, {
+                        method: 'POST',
+                        headers: fetchHeaders,
+                        credentials: 'omit',
+                        body: JSON.stringify({
+                            sessionId: conversationState.sessionId,
+                            userInput: lastUserMessage.text,
+                            chosenResponse: selectedBox.dataset.content,
+                            rejectedResponse: rejectedBox.dataset.content,
+                            timestamp: Date.now(),
+                            conversationContext: conversationState.messages.slice(0, -1) // Include conversation context up to this point
+                        })
+                    });
+                    console.log('DPO data logged successfully');
+                } catch (error) {
+                    console.error('Error logging DPO data:', error);
+                }
             }
             
-            // Add response message and show bottom input
-            displayMessage(selectedBox.textContent, false);
+            // Show bottom input
             bottomInputContainer.classList.add('visible');
             
             // Show token counter
             tokenCounter.classList.add('visible');
+            
+            // Scroll to the latest message
+            const messageDiv = messagesContainer.lastElementChild;
+            if (messageDiv) {
+                messageDiv.scrollIntoView({ behavior: 'smooth' });
+            }
         });
     });
 
