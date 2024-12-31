@@ -111,13 +111,13 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 2rem;
+    padding: 3rem;
     background: linear-gradient(to top, 
-        #1a1a1a 75%,
-        rgba(26, 26, 26, 0.98) 80%,
-        rgba(26, 26, 26, 0.95) 85%,
-        rgba(26, 26, 26, 0.85) 90%,
-        rgba(26, 26, 26, 0.6) 95%,
+        #1a1a1a 65%,
+        rgba(26, 26, 26, 0.98) 75%,
+        rgba(26, 26, 26, 0.95) 82%,
+        rgba(26, 26, 26, 0.85) 88%,
+        rgba(26, 26, 26, 0.6) 94%,
         transparent
     );
     opacity: 0;
@@ -340,6 +340,26 @@ body {
     margin: 1rem 2rem;
     transform: translateX(50px);
     animation: slideInRight 0.5s ease forwards;
+    transition: 
+        border-right-color 0.3s ease,
+        color 0.3s ease,
+        background-color 0.3s ease;
+}
+
+.inference-status.in-message.response {
+    border-right-color: #ffd700;
+    color: #f0f0f0;
+}
+
+.inference-status.in-message .spinner,
+.inference-status.in-message .timer {
+    transition: opacity 0.3s ease;
+}
+
+.inference-status.in-message.response .spinner,
+.inference-status.in-message.response .timer {
+    opacity: 0;
+    position: absolute;
 }
 
 .inference-status.show {
