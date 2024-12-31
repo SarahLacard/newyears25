@@ -455,7 +455,7 @@ body {
 
 .settings-input {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.75rem;
     background: #1a1a1a;
     border: 1px solid #333;
     border-radius: 4px;
@@ -471,14 +471,22 @@ body {
 }
 
 .save-confirmation {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
     color: #4CAF50;
     font-size: 0.9rem;
     opacity: 0;
     transition: opacity 0.3s ease;
-    margin-top: 0.5rem;
 }
 
 .save-confirmation.show {
     opacity: 1;
+}
+
+.settings-modal {
+    width: 80vw;
+    max-width: 800px;
+    padding: 1.5rem;
 }
   
