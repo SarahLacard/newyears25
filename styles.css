@@ -34,15 +34,20 @@ body {
     right: 1rem;
     top: 3rem;
     border: none;
-    width: auto;
-    height: auto;
+    width: 1.2rem;
+    height: 1.2rem;
     color: #666;
     font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .settings-trigger:hover {
     background: none;
     color: #999;
+    transform: rotate(90deg);
 }
 
 .help-trigger:hover {
