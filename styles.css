@@ -278,30 +278,37 @@ body {
 
 .inference-status {
     display: none; /* hidden by default, shown during generation */
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 902;
     align-items: center;
     gap: 0.5rem;
     font-family: 'Inter', monospace;
     font-size: 0.75rem;
     color: #ffd700;
-    animation: slideInLeft 0.3s ease forwards;
     padding: 0.5rem 1rem;
     background: rgba(26, 26, 26, 0.8);
     border-radius: 4px;
     backdrop-filter: blur(4px);
 }
 
-/* Position for initial input */
-.initial-input-container:not(.moved) ~ .inference-status {
-    bottom: calc(50% + 60px); /* Above the centered input */
+/* Initial centered position */
+.inference-status.initial {
+    position: fixed;
+    left: 50%;
+    top: 40%; /* Slightly above center */
+    transform: translate(-50%, -50%);
+    z-index: 902;
+    animation: slideInLeft 0.3s ease forwards;
 }
 
-/* Position for bottom input */
-.initial-input-container.moved ~ .inference-status {
-    bottom: 120px; /* Above the bottom input */
+/* Message-style position */
+.inference-status.in-message {
+    align-self: flex-end;
+    max-width: 70%;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #242424;
+    border-right: 3px solid #ffd700;
+    animation: slideInRight 0.5s ease forwards;
+    margin: 1rem 2rem;
 }
 
 .spinner {

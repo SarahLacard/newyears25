@@ -20,9 +20,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval;
 
     // Inference status handling
-    function showInferenceStatus() {
+    function showInferenceStatus(inMessage = false) {
         const statusEl = document.getElementById('inference-status');
         const timerEl = document.getElementById('timer');
+
+        // Reset classes
+        statusEl.classList.remove('initial', 'in-message');
+        
+        if (inMessage) {
+            // Add to messages container
+            messagesContainer.appendChild(statusEl);
+            statusEl.classList.add('in-message');
+        } else {
+            // Move to body for fixed positioning
+            document.body.appendChild(statusEl);
+            statusEl.classList.add('initial');
+        }
 
         statusEl.style.display = 'flex';
         startTime = performance.now();
@@ -156,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function generateResponses(userInput) {
         try {
-            showInferenceStatus();
+            showInferenceStatus(false); // Show in center for initial response
             const requestUrl = `${API_BASE}/api/generate`;
             console.log('Sending request to:', requestUrl);
             console.log('Request headers:', fetchHeaders);
@@ -198,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function continueConversation(userInput) {
         try {
-            showInferenceStatus();
+            showInferenceStatus(true); // Show in message area for continued conversation
             const response = await fetch(`${API_BASE}/api/generate`, {
                 method: 'POST',
                 headers: fetchHeaders,
